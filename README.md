@@ -1,0 +1,1 @@
+# grafika-gyakorlat-2020-osz
