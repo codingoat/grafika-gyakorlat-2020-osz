@@ -7,6 +7,8 @@ CMyApp::CMyApp(void)
 {
 	m_vaoID = 0;
 	m_vboID = 0;
+	m_ibID = 0;
+
 	m_programID = 0;
 }
 
@@ -30,34 +32,27 @@ bool CMyApp::Init()
 
 	Vertex vert[] =
 	{ 
-		// 1. háromszög
 		//          x,  y, z             R, G, B
-		{glm::vec3(-1, 0, 1), glm::vec3(1, 0, 0)},
-		{glm::vec3(-1, 0, -1), glm::vec3(1, 0, 0)},
-		{glm::vec3(1, 0, 1), glm::vec3(1, 0, 0)},
+		{glm::vec3(-1, -1, 0), glm::vec3(1, 0, 0)},
+		{glm::vec3( 1, -1, 0), glm::vec3(0, 1, 0)},
+		{glm::vec3(-1,  1, 0), glm::vec3(0, 0, 1)},
+		{glm::vec3( 1,  1, 0), glm::vec3(1, 1, 1)},
 
-		// 2. háromszög
-		{glm::vec3(1,  0, 1), glm::vec3(1, 0, 0)},
-		{glm::vec3( -1,  0, -1), glm::vec3(1, 0, 0)},
-		{glm::vec3(1, 0, -1), glm::vec3(1, 0, 0)},
-
-		// oldallapok
-		{glm::vec3(-1,  0, 1), glm::vec3(0, 1, 0)},
-		{glm::vec3(1,  0, 1), glm::vec3(0, 1, 0)},
-		{glm::vec3(0, 2, 0), glm::vec3(0, 1, 0)},
-
-		{glm::vec3(1,  0, 1), glm::vec3(0, 0, 1)},
-		{glm::vec3(1,  0, -1), glm::vec3(0, 0, 1)},
-		{glm::vec3(0, 2, 0), glm::vec3(0, 0, 1)},
-
-		{glm::vec3(1,  0, -1), glm::vec3(1, 1, 0)},
-		{glm::vec3(-1,  0, -1), glm::vec3(1, 1, 0)},
-		{glm::vec3(0, 2, 0), glm::vec3(1, 1, 0)},
-
-		{glm::vec3(-1,  0, -1), glm::vec3(1, 0, 1)},
-		{glm::vec3(-1,  0, 1), glm::vec3(1, 0, 1)},
-		{glm::vec3(0, 2, 0), glm::vec3(1, 0, 1)},
+		{glm::vec3(3,  -1, 0), glm::vec3(1, 0, 0)},
+		{glm::vec3(3,  1, 0), glm::vec3(0, 0, 1)},
 	};
+
+	// indexpuffer adatai
+    GLushort indices[]=
+    {
+		// 1. háromszög
+        0,1,2,
+		// 2. háromszög
+        2,1,3,
+
+		1, 4, 3,
+		4, 5, 3
+    };
 
 	// 1 db VAO foglalasa
 	glGenVertexArrays(1, &m_vaoID);
@@ -95,8 +90,14 @@ bool CMyApp::Init()
 		sizeof(Vertex),
 		(void*)(sizeof(glm::vec3)) );
 
+	// index puffer létrehozása
+	glGenBuffers(1, &m_ibID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 	glBindVertexArray(0); // feltöltüttük a VAO-t, kapcsoljuk le
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // feltöltöttük a VBO-t is, ezt is vegyük le
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // feltöltöttük a VBO-t is, ezt is vegyük le
 
 	//
 	// shaderek betöltése
@@ -152,9 +153,7 @@ bool CMyApp::Init()
 	m_matProj = glm::perspective( 45.0f, 640/480.0f, 1.0f, 1000.0f );
 
 	// shader-beli transzformációs mátrixok címének lekérdezése
-	m_loc_world = glGetUniformLocation( m_programID, "world");
-	m_loc_view  = glGetUniformLocation( m_programID, "view" );
-	m_loc_proj  = glGetUniformLocation( m_programID, "proj" );
+	m_loc_mvp = glGetUniformLocation( m_programID, "MVP");
 
 	return true;
 }
@@ -162,6 +161,7 @@ bool CMyApp::Init()
 void CMyApp::Clean()
 {
 	glDeleteBuffers(1, &m_vboID);
+	glDeleteBuffers(1, &m_ibID);
 	glDeleteVertexArrays(1, &m_vaoID);
 
 	glDeleteProgram( m_programID );
@@ -169,40 +169,12 @@ void CMyApp::Clean()
 
 void CMyApp::Update()
 {
-	time = SDL_GetTicks() / 1000.0f;
-
 	// nézeti transzformáció beállítása
-	m_matView = glm::lookAt(glm::vec3( 0, sinf(time) * 3 + 2,  10),		// honnan nézzük a színteret
-							glm::vec3( 0,  2,  0),		// a színtér melyik pontját nézzük
+	m_matView = glm::lookAt(glm::vec3( 0,  0,  5),		// honnan nézzük a színteret
+							glm::vec3( 0,  0,  0),		// a színtér melyik pontját nézzük
 							glm::vec3( 0,  1,  0));		// felfelé mutató irány a világban
 }
 
-
-void CMyApp::drawPyramid(glm::mat4& world)
-{
-	// majd küldjük át a megfelelõ mátrixokat!
-	glUniformMatrix4fv(m_loc_world,// erre a helyre töltsünk át adatot
-		1,			// egy darab mátrixot
-		GL_FALSE,	// NEM transzponálva
-		&(world[0][0])); // innen olvasva a 16 x sizeof(float)-nyi adatot
-
-	// kapcsoljuk be a VAO-t (a VBO jön vele együtt)
-	glBindVertexArray(m_vaoID);
-
-	// kirajzolás
-	glDrawArrays(GL_TRIANGLES,	// rajzoljunk ki háromszöglista primitívet
-		0,				// a VB elsõ eleme legyen az elsõ kiolvasott vertex
-		6 * 3);				// és 6db csúcspont segítségével rajzoljunk háromszöglistát
-
-	// VAO kikapcsolasa
-	glBindVertexArray(0);
-}
-
-void CMyApp::drawHourglass(glm::mat4& world)
-{
-	drawPyramid(world * glm::mat4(1.0f));
-	drawPyramid(world * glm::translate(glm::vec3(0, 4, 0)) * glm::rotate(glm::radians((float)180), glm::vec3(1, 0, 0)));
-}
 
 void CMyApp::Render()
 {
@@ -221,23 +193,27 @@ void CMyApp::Render()
 		glm::scale<float>( glm::vec3(s_x, s_y, s_z) ) <- léptékezés
 
 	*/
-	m_matWorld = glm::rotate((float)M_PI / 2.0f, glm::vec3(0, 1, 0)) * glm::translate(glm::vec3(2, 0, 0));
+	m_matWorld = glm::mat4(1.0f);
 
+	glm::mat4 mvp = m_matProj * m_matView * m_matWorld;
 
-	glUniformMatrix4fv( m_loc_view,  1, GL_FALSE, &( m_matView[0][0]) );
-	glUniformMatrix4fv( m_loc_proj,  1, GL_FALSE, &( m_matProj[0][0]) );
+	// majd küldjük át a megfelelõ mátrixot!
+	glUniformMatrix4fv( m_loc_mvp,// erre a helyre töltsünk át adatot
+						1,			// egy darab mátrixot
+						GL_FALSE,	// NEM transzponálva
+						&(mvp[0][0]) ); // innen olvasva a 16 x sizeof(float)-nyi adatot
 
-	int N = 10;
-	for (int i = 0; i < N; i++)
-	{
-		float fi = i / (float)N * 2 * M_PI;
-		drawHourglass(glm::rotate(fi + time, glm::vec3(0, 1, 0)) * glm::translate(glm::vec3(6, 0, 0)));
-	}
+	// kapcsoljuk be a VAO-t (a VBO jön vele együtt)
+	glBindVertexArray(m_vaoID);
 
-	//drawHourglass(glm::mat4(1.0f));
-	//drawHourglass(glm::translate(glm::vec3(2, 0, 0)));
+	// kirajzolás
+	glDrawElements(	GL_TRIANGLES,		// primitív típus
+					12,					// hany csucspontot hasznalunk a kirajzolashoz
+					GL_UNSIGNED_SHORT,	// indexek tipusa
+					0);					// indexek cime
 
-
+	// VAO kikapcsolasa
+	glBindVertexArray(0);
 
 	// shader kikapcsolasa
 	glUseProgram( 0 );
