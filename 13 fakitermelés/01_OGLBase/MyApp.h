@@ -68,7 +68,7 @@ protected:
 
 	int N = 20, M = 20;
 
-	VertexArrayObject	m_BakcgroundVao;
+	VertexArrayObject	m_BackgroundVao;
 	IndexBuffer			m_BackgroundIndices;
 	ArrayBuffer			m_BackgroundVbo;
 
@@ -79,6 +79,9 @@ protected:
 	Texture2D			m_woodTexture;
 	Texture2D			m_suzanneTexture;
 	Texture2D			m_grassTexture;
+	Texture2D			m_leavesTexture;
+	Texture2D			m_barkTexture;
+	Texture2D			m_forestTexture;
 
 	// nyers OGL azonosítók
 	GLuint				m_skyboxTexture;
@@ -103,8 +106,12 @@ protected:
 	void InitSphere();
 
 	void DrawTree(glm::mat4& treeWorld);
+	glm::vec3 GetLightColor(float param);
+	void ResetForest();
 
+	glm::vec3 lightColors[5] = { glm::vec3(0.7, 0.7, 0.6), glm::vec3(0.6, 0.4, 0.3), glm::vec3(0.3, 0.6, 0.7), glm::vec3(0.5, 0.7, 0.6), glm::vec3(0.7, 0.7, 0.6) };
 	float trees[20][20];
+	bool treeLines[20];
 
 
 	glm::vec3 GetPos(float u, float v);
@@ -113,6 +120,11 @@ protected:
 	glm::vec3 GetSpherePos(float u, float v);
 	glm::vec3 GetSphereNorm(float u, float v);
 
-	float time = 0;
+	float treeDeltaTime = 0;
+	float yearTime = 0, newTreeTime = 0;
+	float treeGrowthLength = 10, yearLength = 20;
+	float maxTreeSize = 1;
+
+
 };
 

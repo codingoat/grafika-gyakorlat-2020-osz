@@ -11,13 +11,13 @@ out vec4 fs_out_col;
 uniform vec3 light_dir = vec3(-1,-1,-1);
 
 // fénytulajdonságok: ambiens, diffúz, ...
-uniform vec3 La = vec3(0.4, 0.4, 0.4);
+uniform vec3 La = vec3(0.2, 0.2, 0.2);
 uniform vec3 Ld = vec3(0.6, 0.6, 0.6);
+uniform vec3 Ls = vec3(1.2, 1.2, 1.2);
 
 uniform sampler2D texImage;
-uniform samplerCube texSkybox;
 
-uniform vec3 camPos;
+uniform vec3 cam_pos;
 
 void main()
 {
@@ -26,17 +26,14 @@ void main()
 
 	vec3 normal = normalize(vs_out_norm);
 	vec3 to_light = normalize(-light_dir);
-	
 	float cosa = clamp(dot(normal, to_light), 0, 1);
-
 	vec3 diffuse = cosa*Ld;
 
-
-	vec3 camToFrag = normalize(vs_out_pos - camPos);
-	vec3 reflected = reflect(camToFrag, normalize(vs_out_norm));
-	vec4 skyboxColor = texture(texSkybox, reflected);
-
+	vec3 light_reflected = normalize( reflect(light_dir, vs_out_norm));
+	vec3 to_cam = normalize(cam_pos - vs_out_pos);
+	float specular_str = pow( clamp(dot(light_reflected, to_cam), 0, 1), 50);
+	vec3 specular = Ls * specular_str;
 
 	
-	fs_out_col = mix(vec4(ambient + diffuse, 1) * texture(texImage, vs_out_tex), skyboxColor, 0.2);
+	fs_out_col = vec4(ambient + diffuse + specular, 1) * texture(texImage, vs_out_tex);
 }

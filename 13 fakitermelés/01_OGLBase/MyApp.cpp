@@ -1,7 +1,10 @@
-#include "MyApp.h"
+Ôªø#include "MyApp.h"
 
 #include <math.h>
 #include <vector>
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
+#include <sstream>     // ui strings
 
 #include <array>
 #include <list>
@@ -70,30 +73,30 @@ void CMyApp::InitCube()
 	}
 
 	//
-	// geometria defini·l·sa (std::vector<...>) Ès GPU pufferekbe valÛ feltˆltÈse BufferData-val
+	// geometria defini√°l√°sa (std::vector<...>) √©s GPU pufferekbe val√≥ felt√∂lt√©se BufferData-val
 	//
 
-	// vertexek pozÌciÛi:
+	// vertexek poz√≠ci√≥i:
 	/*
-	Az m_CubeVertexBuffer konstruktora m·r lÈtrehozott egy GPU puffer azonosÌtÛt Ès a most kˆvetkezı BufferData hÌv·s ezt
-	1. bind-olni fogja GL_ARRAY_BUFFER target-re (hiszen m_CubeVertexBuffer tÌpusa ArrayBuffer) Ès
-	2. glBufferData segÌtsÈgÈvel ·ttˆlti a GPU-ra az argumentumban adott t·rolÛ ÈrtÈkeit
+	Az m_CubeVertexBuffer konstruktora m√°r l√©trehozott egy GPU puffer azonos√≠t√≥t √©s a most k√∂vetkez√µ BufferData h√≠v√°s ezt
+	1. bind-olni fogja GL_ARRAY_BUFFER target-re (hiszen m_CubeVertexBuffer t√≠pusa ArrayBuffer) √©s
+	2. glBufferData seg√≠ts√©g√©vel √°tt√∂lti a GPU-ra az argumentumban adott t√°rol√≥ √©rt√©keit
 
 	*/
 
 	m_CubeVertexBuffer.BufferData(vertices);
 
-	// Ès a primitÌveket alkotÛ cs˙cspontok indexei (az elızı tˆmbˆkbıl) - triangle list-el valÛ kirajzol·sra felkÈsz¸lve
+	// √©s a primit√≠veket alkot√≥ cs√∫cspontok indexei (az el√µz√µ t√∂mb√∂kb√µl) - triangle list-el val√≥ kirajzol√°sra felk√©sz√ºlve
 	m_CubeIndices.BufferData(indices);
 
-	// geometria VAO-ban valÛ regisztr·l·sa
+	// geometria VAO-ban val√≥ regisztr√°l√°sa
 	m_CubeVao.Init(
 		{
-			// 0-·s attrib˙tum "lÈnyegÈben" glm::vec3-ak sorozata Ès az adatok az m_CubeVertexBuffer GPU pufferben vannak
-			{ CreateAttribute<		0,						// attrib˙tum: 0
-									glm::vec3,				// CPU oldali adattÌpus amit a 0-·s attrib˙tum meghat·roz·s·ra haszn·ltunk <- az elj·r·s a glm::vec3-bÛl kikˆvetkezteti, hogy 3 darab float-bÛl ·ll a 0-·s attrib˙tum
-									0,						// offset: az attrib˙tum t·rolÛ elejÈtıl vett offset-je, byte-ban
-									sizeof(Vertex)			// stride: a kˆvetkezı cs˙cspont ezen attrib˙tuma h·ny byte-ra van az aktu·listÛl
+			// 0-√°s attrib√∫tum "l√©nyeg√©ben" glm::vec3-ak sorozata √©s az adatok az m_CubeVertexBuffer GPU pufferben vannak
+			{ CreateAttribute<		0,						// attrib√∫tum: 0
+									glm::vec3,				// CPU oldali adatt√≠pus amit a 0-√°s attrib√∫tum meghat√°roz√°s√°ra haszn√°ltunk <- az elj√°r√°s a glm::vec3-b√≥l kik√∂vetkezteti, hogy 3 darab float-b√≥l √°ll a 0-√°s attrib√∫tum
+									0,						// offset: az attrib√∫tum t√°rol√≥ elej√©t√µl vett offset-je, byte-ban
+									sizeof(Vertex)			// stride: a k√∂vetkez√µ cs√∫cspont ezen attrib√∫tuma h√°ny byte-ra van az aktu√°list√≥l
 								>, m_CubeVertexBuffer },
 			{ CreateAttribute<1, glm::vec3, (sizeof(glm::vec3)), sizeof(Vertex)>, m_CubeVertexBuffer },
 			{ CreateAttribute<2, glm::vec2, (2 * sizeof(glm::vec3)), sizeof(Vertex)>, m_CubeVertexBuffer },
@@ -146,11 +149,11 @@ void CMyApp::InitPlane()
 	m_PlaneIndices.BufferData(indices);
 	m_PlaneVao.Init(
 		{
-			// 0-·s attrib˙tum "lÈnyegÈben" glm::vec3-ak sorozata Ès az adatok az m_CubeVertexBuffer GPU pufferben vannak
-			{ CreateAttribute<		0,						// attrib˙tum: 0
-									glm::vec3,				// CPU oldali adattÌpus amit a 0-·s attrib˙tum meghat·roz·s·ra haszn·ltunk <- az elj·r·s a glm::vec3-bÛl kikˆvetkezteti, hogy 3 darab float-bÛl ·ll a 0-·s attrib˙tum
-									0,						// offset: az attrib˙tum t·rolÛ elejÈtıl vett offset-je, byte-ban
-									sizeof(Vertex)			// stride: a kˆvetkezı cs˙cspont ezen attrib˙tuma h·ny byte-ra van az aktu·listÛl
+			// 0-√°s attrib√∫tum "l√©nyeg√©ben" glm::vec3-ak sorozata √©s az adatok az m_CubeVertexBuffer GPU pufferben vannak
+			{ CreateAttribute<		0,						// attrib√∫tum: 0
+									glm::vec3,				// CPU oldali adatt√≠pus amit a 0-√°s attrib√∫tum meghat√°roz√°s√°ra haszn√°ltunk <- az elj√°r√°s a glm::vec3-b√≥l kik√∂vetkezteti, hogy 3 darab float-b√≥l √°ll a 0-√°s attrib√∫tum
+									0,						// offset: az attrib√∫tum t√°rol√≥ elej√©t√µl vett offset-je, byte-ban
+									sizeof(Vertex)			// stride: a k√∂vetkez√µ cs√∫cspont ezen attrib√∫tuma h√°ny byte-ra van az aktu√°list√≥l
 								>, m_PlaneVbo },
 			{ CreateAttribute<1, glm::vec3, (sizeof(glm::vec3)), sizeof(Vertex)>, m_PlaneVbo },
 			{ CreateAttribute<2, glm::vec2, (2 * sizeof(glm::vec3)), sizeof(Vertex)>, m_PlaneVbo },
@@ -211,11 +214,11 @@ void CMyApp::InitSphere()
 	m_SphereIndices.BufferData(indices);
 	m_SphereVao.Init(
 		{
-			// 0-·s attrib˙tum "lÈnyegÈben" glm::vec3-ak sorozata Ès az adatok az m_CubeVertexBuffer GPU pufferben vannak
-			{ CreateAttribute<		0,						// attrib˙tum: 0
-									glm::vec3,				// CPU oldali adattÌpus amit a 0-·s attrib˙tum meghat·roz·s·ra haszn·ltunk <- az elj·r·s a glm::vec3-bÛl kikˆvetkezteti, hogy 3 darab float-bÛl ·ll a 0-·s attrib˙tum
-									0,						// offset: az attrib˙tum t·rolÛ elejÈtıl vett offset-je, byte-ban
-									sizeof(Vertex)			// stride: a kˆvetkezı cs˙cspont ezen attrib˙tuma h·ny byte-ra van az aktu·listÛl
+			// 0-√°s attrib√∫tum "l√©nyeg√©ben" glm::vec3-ak sorozata √©s az adatok az m_CubeVertexBuffer GPU pufferben vannak
+			{ CreateAttribute<		0,						// attrib√∫tum: 0
+									glm::vec3,				// CPU oldali adatt√≠pus amit a 0-√°s attrib√∫tum meghat√°roz√°s√°ra haszn√°ltunk <- az elj√°r√°s a glm::vec3-b√≥l kik√∂vetkezteti, hogy 3 darab float-b√≥l √°ll a 0-√°s attrib√∫tum
+									0,						// offset: az attrib√∫tum t√°rol√≥ elej√©t√µl vett offset-je, byte-ban
+									sizeof(Vertex)			// stride: a k√∂vetkez√µ cs√∫cspont ezen attrib√∫tuma h√°ny byte-ra van az aktu√°list√≥l
 								>, m_SphereVbo },
 			{ CreateAttribute<1, glm::vec3, (sizeof(glm::vec3)), sizeof(Vertex)>, m_SphereVbo },
 			{ CreateAttribute<2, glm::vec2, (2 * sizeof(glm::vec3)), sizeof(Vertex)>, m_SphereVbo },
@@ -229,12 +232,12 @@ void CMyApp::InitSkyBox()
 {
 	m_SkyboxPos.BufferData(
 		std::vector<glm::vec3>{
-		// h·tsÛ lap
+		// h√°ts√≥ lap
 		glm::vec3(-1, -1, -1),
 		glm::vec3(1, -1, -1),
 		glm::vec3(1, 1, -1),
 		glm::vec3(-1, 1, -1),
-		// el¸lsı lap
+		// el√ºls√µ lap
 		glm::vec3(-1, -1, 1),
 		glm::vec3(1, -1, 1),
 		glm::vec3(1, 1, 1),
@@ -242,13 +245,13 @@ void CMyApp::InitSkyBox()
 	}
 	);
 
-	// Ès a primitÌveket alkotÛ cs˙cspontok indexei (az elızı tˆmbˆkbıl) - triangle list-el valÛ kirajzol·sra felkÈsz¸lve
+	// √©s a primit√≠veket alkot√≥ cs√∫cspontok indexei (az el√µz√µ t√∂mb√∂kb√µl) - triangle list-el val√≥ kirajzol√°sra felk√©sz√ºlve
 	m_SkyboxIndices.BufferData(
 		std::vector<int>{
-			// h·tsÛ lap
+			// h√°ts√≥ lap
 			0, 1, 2,
 			2, 3, 0,
-			// el¸lsı lap
+			// el√ºls√µ lap
 			4, 6, 5,
 			6, 4, 7,
 			// bal
@@ -257,16 +260,16 @@ void CMyApp::InitSkyBox()
 			// jobb
 			1, 5, 2,
 			5, 6, 2,
-			// alsÛ
+			// als√≥
 			1, 0, 4,
 			1, 4, 5,
-			// felsı
+			// fels√µ
 			3, 2, 6,
 			3, 6, 7,
 	}
 	);
 
-	// geometria VAO-ban valÛ regisztr·l·sa
+	// geometria VAO-ban val√≥ regisztr√°l√°sa
 	m_SkyboxVao.Init(
 		{
 			{ CreateAttribute<0, glm::vec3, 0, sizeof(glm::vec3)>, m_SkyboxPos },
@@ -295,28 +298,62 @@ void CMyApp::InitSkyBox()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 }
-/*
+
 void CMyApp::InitBackground()
 {
-	m_SkyboxPos.BufferData(
+	m_BackgroundVbo.BufferData(
 		std::vector<Vertex>{
-			// h·tsÛ lap
-			{glm::vec3(-1, -1, -1), },
-			{glm::vec3(1, -1, -1), },
-			{glm::vec3(1, 1, -1), },
-			{glm::vec3(-1, 1, -1),},
-			// el¸lsı lap		 
-			{glm::vec3(-1, -1, 1),},
-			{glm::vec3(1, -1, 1), },
-			{glm::vec3(1, 1, 1),  },
-			{glm::vec3(-1, 1, 1), },
-	}
+			// h√°ts√≥ lap
+			{ glm::vec3(-1, -1, -1), glm::vec3(0, 0, 1), glm::vec2(0, 0) }, // 0
+			{ glm::vec3(1, -1, -1),  glm::vec3(0, 0, 1), glm::vec2(1, 0) },
+			{ glm::vec3(1, 1, -1),   glm::vec3(0, 0, 1), glm::vec2(1, 1) },
+			{ glm::vec3(-1, 1, -1),  glm::vec3(0, 0, 1), glm::vec2(0, 1) }, // 3
+			// jobb oldali lap
+			{ glm::vec3(1, -1, -1),  glm::vec3(-1, 0, 0), glm::vec2(0, 0) }, // 4
+			{ glm::vec3(1, -1, 1),   glm::vec3(-1, 0, 0), glm::vec2(1, 0) },
+			{ glm::vec3(1, 1, 1),    glm::vec3(-1, 0, 0), glm::vec2(1, 1) },
+			{ glm::vec3(1, 1, -1),   glm::vec3(-1, 0, 0), glm::vec2(0, 1) }, // 7
+			// el√ºls√µ lap		 	 
+			{ glm::vec3(1, -1, 1),   glm::vec3(0, 0, -1), glm::vec2(0, 0) }, // 8
+			{ glm::vec3(-1, -1, 1),  glm::vec3(0, 0, -1), glm::vec2(1, 0) },
+			{ glm::vec3(-1, 1, 1),   glm::vec3(0, 0, -1), glm::vec2(1, 1) },
+			{ glm::vec3(1, 1, 1),    glm::vec3(0, 0, -1), glm::vec2(0, 1) }, // 11
+			// bal oldali lap
+			{ glm::vec3(-1, -1, 1),  glm::vec3(0, 0, -1), glm::vec2(0, 0) }, // 12
+			{ glm::vec3(-1, -1, -1), glm::vec3(0, 0, -1), glm::vec2(1, 0) },
+			{ glm::vec3(-1, 1, -1),  glm::vec3(0, 0, -1), glm::vec2(1, 1) },
+			{ glm::vec3(-1, 1, 1),   glm::vec3(0, 0, -1), glm::vec2(0, 1) } // 15
+	});
+
+	m_BackgroundIndices.BufferData(
+		std::vector<int>{
+			// h√°ts√≥ lap
+			0, 1, 2,
+			2, 3, 0,
+			// jobb
+			4, 5, 6,
+			6, 7, 4,
+			// el√ºls≈ë
+			8, 9, 10,
+			10, 11, 8,
+			// jobb
+			12, 13, 14,
+			14, 15, 12
+	});
+
+	m_BackgroundVao.Init(
+		{
+			{ CreateAttribute<0, glm::vec3, 0, sizeof(Vertex)>, m_BackgroundVbo },
+			{ CreateAttribute<1, glm::vec3, (sizeof(glm::vec3)), sizeof(Vertex)>, m_BackgroundVbo },
+			{ CreateAttribute<2, glm::vec2, (2 * sizeof(glm::vec3)), sizeof(Vertex)>, m_BackgroundVbo },
+		},
+		m_BackgroundIndices
 	);
-}*/
+}
 
 void CMyApp::InitShaders()
 {
-	// a shadereket t·rolÛ program lÈtrehoz·sa az OpenGL-hez hasonlÛ mÛdon:
+	// a shadereket t√°rol√≥ program l√©trehoz√°sa az OpenGL-hez hasonl√≥ m√≥don:
 	m_program.AttachShaders({
 		{ GL_VERTEX_SHADER, "myVert.vert"},
 		{ GL_FRAGMENT_SHADER, "myFrag.frag"}
@@ -331,44 +368,48 @@ void CMyApp::InitShaders()
 
 	m_program.LinkProgram();
 
-	// shader program rˆvid lÈtrehoz·sa, egyetlen f¸ggvÈnyhÌv·ssal a fenti h·rom:
-	m_programSkybox.Init(
-		{
-			{ GL_VERTEX_SHADER, "skybox.vert" },
-			{ GL_FRAGMENT_SHADER, "skybox.frag" }
-		},
+// shader program r√∂vid l√©trehoz√°sa, egyetlen f√ºggv√©nyh√≠v√°ssal a fenti h√°rom:
+m_programSkybox.Init(
+	{
+		{ GL_VERTEX_SHADER, "skybox.vert" },
+		{ GL_FRAGMENT_SHADER, "skybox.frag" }
+	},
 		{
 			{ 0, "vs_in_pos" },				// VAO 0-as csatorna menjen a vs_in_pos-ba
 		}
-	);
+		);
 
-	m_programAxes.Init(
-		{
-			{ GL_VERTEX_SHADER, "axes.vert"},
-			{ GL_FRAGMENT_SHADER, "axes.frag"}
-		},
-		{}
-	);
+m_programAxes.Init(
+	{
+		{ GL_VERTEX_SHADER, "axes.vert"},
+		{ GL_FRAGMENT_SHADER, "axes.frag"}
+	},
+	{}
+);
 }
 
 bool CMyApp::Init()
 {
-	// tˆrlÈsi szÌn legyen kÈkes
+	// t√∂rl√©si sz√≠n legyen k√©kes
 	glClearColor(0.125f, 0.25f, 0.5f, 1.0f);
 
 	glEnable(GL_CULL_FACE); // kapcsoljuk be a hatrafele nezo lapok eldobasat
-	glEnable(GL_DEPTH_TEST); // mÈlysÈgi teszt bekapcsol·sa (takar·s)
+	glEnable(GL_DEPTH_TEST); // m√©lys√©gi teszt bekapcsol√°sa (takar√°s)
 
 	InitShaders();
 	InitCube();
 	InitSkyBox();
 	InitPlane();
 	InitSphere();
+	InitBackground();
 
-	// egyÈb text˙r·k betˆltÈse
+	// egy√©b text√∫r√°k bet√∂lt√©se
 	m_woodTexture.FromFile("assets/wood.jpg");
 	m_suzanneTexture.FromFile("assets/marron.jpg");
 	m_grassTexture.FromFile("assets/grass.jpg");
+	m_leavesTexture.FromFile("assets/leaves.jpg");
+	m_barkTexture.FromFile("assets/bark.jpg");
+	m_forestTexture.FromFile("assets/forest.jpg");
 
 	// mesh betoltese
 	m_mesh = ObjParser::parse("assets/Suzanne.obj");
@@ -376,26 +417,28 @@ bool CMyApp::Init()
 
 	m_cylinderMesh = ObjParser::parse("assets/henger.obj");
 	m_cylinderMesh->initBuffers();
-	
+
 	// kamera
 	m_camera.SetProj(45.0f, 640.0f / 480.0f, 0.01f, 1000.0f);
 
+	//random
+	srand(time(NULL));
 
+	ResetForest();
+
+	return true;
+}
+
+void CMyApp::ResetForest()
+{
 	for (int i = 0; i < 20; i++)
 	{
+		treeLines[i] = false;
 		for (int j = 0; j < 20; j++)
 		{
 			trees[i][j] = 0;
 		}
 	}
-
-	trees[5][5] = 1;
-	trees[10][4] = 0.4f;
-	trees[16][15] = 0.8f;
-
-
-
-	return true;
 }
 
 void CMyApp::Clean()
@@ -409,7 +452,32 @@ void CMyApp::Update()
 {
 	static Uint32 last_time = SDL_GetTicks();
 	float delta_time = (SDL_GetTicks() - last_time) / 1000.0f;
-	time += delta_time * 0;
+
+	treeDeltaTime = delta_time / treeGrowthLength;
+	yearTime += delta_time / yearLength * 4;
+	yearTime = fmod(yearTime, 4); // yearTime maradeka 4-el osztva: yearTime [0, 4)
+	newTreeTime += delta_time;
+
+	bool plantTrees = false;
+	if (newTreeTime > 2)
+	{
+		newTreeTime -= 2;
+		plantTrees = true;
+	}
+
+	// tree growth and planting
+	for (int i = 0; i < 20; i++)
+	{
+		for (int j = 0; j < 20; j++)
+		{
+			if (trees[i][j] >= maxTreeSize)
+				trees[i][j] = 0;
+			else if (trees[i][j] > 0)
+				trees[i][j] += treeDeltaTime;
+			else if (plantTrees && (rand() % 20) == 0 && !treeLines[i])
+				trees[i][j] = 0.05f;
+		}
+	}
 
 	m_camera.Update(delta_time);
 
@@ -427,6 +495,8 @@ void CMyApp::DrawTree(glm::mat4& treeWorld)
 	m_program.SetUniform("MVP", viewProj * sphereWorld);
 	m_program.SetUniform("world", sphereWorld);
 	m_program.SetUniform("worldIT", glm::inverse(glm::transpose(sphereWorld)));
+	m_program.SetTexture("texImage", 0, m_leavesTexture);
+
 
 	glDrawElements(GL_TRIANGLES, 3 * 2 * (N) * (M), GL_UNSIGNED_INT, 0);
 
@@ -435,6 +505,8 @@ void CMyApp::DrawTree(glm::mat4& treeWorld)
 	m_program.SetUniform("MVP", viewProj * cylinderWorld);
 	m_program.SetUniform("world", cylinderWorld);
 	m_program.SetUniform("worldIT", glm::inverse(glm::transpose(cylinderWorld)));
+	m_program.SetTexture("texImage", 0, m_barkTexture);
+
 
 	m_cylinderMesh->draw();
 
@@ -442,26 +514,49 @@ void CMyApp::DrawTree(glm::mat4& treeWorld)
 
 }
 
+
+// 0 <= param <= 4
+glm::vec3 CMyApp::GetLightColor(float param)
+{
+	if (param < 0) return lightColors[0];
+	if (param >= 4) return lightColors[4];
+
+	int interval = (int)param;
+	float localT = param - interval;
+
+	return lightColors[interval] * (1 - localT) + lightColors[interval + 1] * (localT);
+}
+
 void CMyApp::Render()
 {
-	// tˆrˆlj¸k a frampuffert (GL_COLOR_BUFFER_BIT) Ès a mÈlysÈgi Z puffert (GL_DEPTH_BUFFER_BIT)
+	glm::vec3 currentLightColor = GetLightColor(yearTime);
+
+	// t√∂r√∂lj√ºk a frampuffert (GL_COLOR_BUFFER_BIT) √©s a m√©lys√©gi Z puffert (GL_DEPTH_BUFFER_BIT)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 viewProj = m_camera.GetViewProj();
 
 	//Suzanne
-	glm::mat4 suzanneWorld = glm::mat4(1.0f);
+	/*glm::mat4 suzanneWorld = glm::mat4(1.0f);
 	m_program.Use();
 	m_program.SetTexture("texImage", 0, m_suzanneTexture);
 	m_program.SetUniform("MVP", viewProj * suzanneWorld);
 	m_program.SetUniform("world", suzanneWorld);
 	m_program.SetUniform("worldIT", glm::inverse(glm::transpose(suzanneWorld)));
 
-	m_program.SetCubeTexture("texSkybox", 1, m_skyboxTexture);
-	m_program.SetUniform("camPos", m_camera.GetEye());
+	m_program.SetUniform("Ld", currentLightColor);
+	m_program.SetUniform("Ls", 1.5f * currentLightColor);
+	m_program.SetUniform("cam_pos", m_camera.GetEye());
 
-	m_mesh->draw();
+	m_mesh->draw();*/
 
+
+	m_program.Use();
+	m_program.SetUniform("Ld", currentLightColor);
+	m_program.SetUniform("Ls", 1.5f * currentLightColor);
+	m_program.SetUniform("cam_pos", m_camera.GetEye());
+
+	//plane
 
 	m_PlaneVao.Bind();
 	glm::mat4 planeWorld = glm::translate(glm::vec3(-10, 0, 10)) * glm::scale(glm::vec3(20, 1, 20));
@@ -472,7 +567,18 @@ void CMyApp::Render()
 
 	glDrawElements(GL_TRIANGLES, 3 * 2 * (N) * (M), GL_UNSIGNED_INT, 0);
 
-	
+
+
+	// background
+	m_BackgroundVao.Bind();
+	glm::mat4 backgroundWorld = glm::translate(glm::vec3(0, 1.5, 0)) * glm::scale(glm::vec3(10, 3, 10));
+	m_program.SetUniform("MVP", viewProj * backgroundWorld);
+	m_program.SetUniform("world", backgroundWorld);
+	m_program.SetUniform("worldIT", glm::inverse(glm::transpose(backgroundWorld)));
+	m_program.SetTexture("texImage", 0, m_forestTexture);
+
+	glDrawElements(GL_TRIANGLES, 3 * 2 * 4, GL_UNSIGNED_INT, 0);
+
 
 	// fak
 
@@ -485,73 +591,78 @@ void CMyApp::Render()
 				float u = i / (float)20;
 				float v = j / (float)20;
 
-				glm::vec3 treePos = glm::translate(glm::vec3(-10, 0, 10)) * glm::scale(glm::vec3(20, 1, 20)) * glm::vec4(GetPos(u, v), 1);              
+				glm::vec3 treePos = glm::translate(glm::vec3(-10, 0, 10)) * glm::scale(glm::vec3(20, 1, 20)) * glm::vec4(GetPos(u, v), 1);
 
-				DrawTree( glm::translate(treePos) * glm::scale(glm::vec3(trees[i][j], trees[i][j], trees[i][j])));
+				DrawTree(glm::translate(treePos) * glm::scale(glm::vec3(trees[i][j], trees[i][j], trees[i][j])));
 			}
 		}
 	}
 
 
-	
-
-
-
-	// kock·k
-	m_program.Use();
-	m_CubeVao.Bind();
-	m_program.SetTexture("texImage", 0, m_woodTexture);
-	glm::mat4 cubeWorld;
-
-	float boxtime = time * 2 * float(M_PI) / 10;
-	for (int i = 0; i < 10; ++i)
-	{
-		cubeWorld =
-			glm::rotate(boxtime + 2 * glm::pi<float>() / 10 * i, glm::vec3(0, 1, 0))*
-			glm::translate(glm::vec3(10 + 5 * sin(boxtime), 0, 0))*
-			glm::rotate((i + 1)*boxtime, glm::vec3(0, 1, 0));
-		m_program.SetUniform("MVP", viewProj * cubeWorld);
-		m_program.SetUniform("world", cubeWorld);
-		m_program.SetUniform("worldIT", glm::inverse(glm::transpose(cubeWorld)));
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-	}
-	m_program.Unuse();
-
-	m_programAxes.Use();
+	/*m_programAxes.Use();
 	m_programAxes.SetUniform("MVP", viewProj * glm::translate(glm::vec3(1, 0, 0)));
-	glDrawArrays(GL_LINES, 0, 6);
+	glDrawArrays(GL_LINES, 0, 6);*/
 
 	// skybox
-	// ments¸k el az elızı Z-test eredmÈnyt, azaz azt a rel·ciÛt, ami alapj·n update-elj¸k a pixelt.
+	// ments√ºk el az el√µz√µ Z-test eredm√©nyt, azaz azt a rel√°ci√≥t, ami alapj√°n update-elj√ºk a pixelt.
 	GLint prevDepthFnc;
 	glGetIntegerv(GL_DEPTH_FUNC, &prevDepthFnc);
 
-	// most kisebb-egyenlıt haszn·ljunk, mert mindent kitolunk a t·voli v·gÛsÌkokra
+	// most kisebb-egyenl√µt haszn√°ljunk, mert mindent kitolunk a t√°voli v√°g√≥s√≠kokra
 	glDepthFunc(GL_LEQUAL);
 
 	m_SkyboxVao.Bind();
 	m_programSkybox.Use();
-	m_programSkybox.SetUniform("MVP", viewProj * glm::translate( m_camera.GetEye()) );
-	
-	// cube map text˙ra be·llÌt·sa 0-·s mintavÈtelezıre Ès annak a shaderre be·llÌt·sa
+	m_programSkybox.SetUniform("MVP", viewProj * glm::translate(m_camera.GetEye()));
+
+	// cube map text√∫ra be√°ll√≠t√°sa 0-√°s mintav√©telez√µre √©s annak a shaderre be√°ll√≠t√°sa
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_skyboxTexture);
 	glUniform1i(m_programSkybox.GetLocation("skyboxTexture"), 0);
-	// az elızı h·rom sor <=> m_programSkybox.SetCubeTexture("skyboxTexture", 0, m_skyboxTexture);
+	// az el√µz√µ h√°rom sor <=> m_programSkybox.SetCubeTexture("skyboxTexture", 0, m_skyboxTexture);
 
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 	m_programSkybox.Unuse();
 
-	// vÈg¸l ·llÌtsuk vissza
+	// v√©g√ºl √°ll√≠tsuk vissza
 	glDepthFunc(prevDepthFnc);
 
 
-	// 1. feladat: kÈszÌts egy vertex shader-fragment shader p·rt, ami t·rolt geometria _nÈlk¸l_ kirajzol egy tetszıleges pozÌciÛba egy XYZ tengely-h·rmast,
-	//			   ahol az X piros, az Y zˆld a Z pedig kÈk!
+	// 1. feladat: k√©sz√≠ts egy vertex shader-fragment shader p√°rt, ami t√°rolt geometria _n√©lk√ºl_ kirajzol egy tetsz√µleges poz√≠ci√≥ba egy XYZ tengely-h√°rmast,
+	//			   ahol az X piros, az Y z√∂ld a Z pedig k√©k!
 
 	//ImGui Testwindow
 	ImGui::ShowTestWindow();
+
+	if (ImGui::Begin("fakitermeles"))
+	{
+		ImGui::InputFloat("ev hossza", &yearLength, 1, 0.5);
+		yearLength = std::max(yearLength, 1.0f);
+		ImGui::InputFloat("fa novesi ideje", &treeGrowthLength, 1, 0.5);
+		treeGrowthLength = std::max(treeGrowthLength, 1.0f);
+		ImGui::SliderFloat("kivagando fak merete", &maxTreeSize, 0.5, 1.2);
+
+		if (ImGui::Button("erdoirtas")) ResetForest();
+
+		ImGui::Text("Fasorok letiltasa");
+
+		for (int i = 0; i < 20; i++)
+		{
+ 			std::stringstream title; // #include<sstream>
+			title << (i + 1) << ". fasor"; 
+
+			ImGui::Selectable(title.str().c_str(), &treeLines[i]);
+		}
+
+		ImGui::ColorEdit3("nyar", (float*)&lightColors[0]);
+		lightColors[4] = lightColors[0];
+		ImGui::ColorEdit3("tel", (float*)&lightColors[2]);
+	
+	}
+	ImGui::End();
 }
+
+
 
 void CMyApp::KeyboardDown(SDL_KeyboardEvent& key)
 {
@@ -580,7 +691,7 @@ void CMyApp::MouseWheel(SDL_MouseWheelEvent& wheel)
 {
 }
 
-// a kÈt paramÈterbe az ˙j ablakmÈret szÈlessÈge (_w) Ès magass·ga (_h) tal·lhatÛ
+// a k√©t param√©terbe az √∫j ablakm√©ret sz√©less√©ge (_w) √©s magass√°ga (_h) tal√°lhat√≥
 void CMyApp::Resize(int _w, int _h)
 {
 	glViewport(0, 0, _w, _h );
